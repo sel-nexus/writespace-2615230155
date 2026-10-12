@@ -229,7 +229,7 @@ it("binds optional field, input value and error description", async () => {
   expect(screen.getByRole("alert")).toHaveTextContent("Required");
 });
 it.each(["/blogs", "/blog/p1", "/write", "/edit/p1", "/admin", "/users"])(
-  "redirects guest future protected route %s to login",
+  "redirects guest protected route %s to login",
   (path) => {
     window.history.replaceState({}, "", path);
     render(<App />);
@@ -247,20 +247,20 @@ it.each([
   expect(screen.getByRole("heading", { name: heading })).toBeInTheDocument();
   expect(window.location.pathname).toBe(path);
 });
+it.each([
+  ["/admin", "Admin Dashboard"],
+  ["/users", "Users"],
+])("renders real guarded administration route %s", (path, heading) => {
+  writeSession(DEFAULT_ADMIN);
+  window.history.replaceState({}, "", path);
+  render(<App />);
+  expect(
+    screen.getByRole("heading", { name: heading, level: 1 })
+  ).toBeInTheDocument();
+  expect(window.location.pathname).toBe(path);
+});
 it.each(["/admin", "/users"])(
-  "renders guarded NotFound for allowed future route %s",
-  (path) => {
-    writeSession(DEFAULT_ADMIN);
-    window.history.replaceState({}, "", path);
-    render(<App />);
-    expect(
-      screen.getByRole("heading", { name: "Page not found" })
-    ).toBeInTheDocument();
-    expect(window.location.pathname).toBe(path);
-  }
-);
-it.each(["/admin", "/users"])(
-  "redirects member Admin route %s before NotFound",
+  "redirects member Admin route %s before administration renders",
   (path) => {
     writeSession(member);
     window.history.replaceState({}, "", path);

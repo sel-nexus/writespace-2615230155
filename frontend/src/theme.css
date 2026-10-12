@@ -100,6 +100,59 @@ body { margin: 0; min-width: 320px; }
   .hero-inner { grid-template-columns: 1.2fr 0.8fr; padding-top: 6rem; padding-bottom: 6rem; }
   .recent-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
+/* Extend the source palette only for local Admin oversight. */
+.admin-page { @apply py-10; }
+.admin-banner { @apply rounded-2xl p-6 sm:p-10 text-white; background: linear-gradient(120deg, #7c3aed, #4f46e5); }
+.admin-banner h1 { font-size: clamp(2.25rem, 5vw, 3.5rem); }
+.admin-stats { @apply grid gap-4 my-8; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.admin-stat { @apply bg-surface border border-border border-t-4 rounded-xl p-5; }
+.admin-stat p { @apply text-sm text-muted; }
+.admin-stat strong { @apply block text-3xl mt-3; font-variant-numeric: tabular-nums; }
+.accent-indigo { border-top-color: #4f46e5; }
+.accent-violet { border-top-color: #7c3aed; }
+.accent-pink { border-top-color: #ec4899; }
+.accent-teal { border-top-color: #14b8a6; }
+.admin-quick-links, .admin-post-actions { @apply flex flex-col gap-3; }
+.admin-recent, .managed-list { @apply mt-10; }
+.admin-posts { @apply mt-6; }
+.admin-post { @apply grid gap-4 py-6 border-b border-border; }
+.admin-post h3, .admin-post p, .account-identity, .users-table td, .user-card dd { overflow-wrap: anywhere; }
+.admin-post-actions { align-items: stretch; }
+.managed-create { @apply mt-8 bg-surface border border-border rounded-2xl p-6; }
+.managed-form { @apply grid gap-5 mt-6; }
+.managed-form select { @apply w-full rounded-xl border bg-surface p-3 text-foreground; border-color: #94a3b8; }
+.managed-form select[aria-invalid='true'] { border-color: #dc2626; }
+.success-banner { @apply bg-teal-50 text-teal-800 border border-teal-200 p-4 rounded-xl; }
+.users-table-wrap { display: none; }
+.users-table { @apply w-full text-left bg-surface; table-layout: fixed; }
+.users-table th, .users-table td { @apply px-3 py-4 border-b border-border align-top; }
+.users-table th { @apply text-sm text-muted font-medium; }
+.users-table th:first-child { width: 26%; }
+.account-identity { @apply flex items-center gap-3 min-w-0; }
+.role-badge { @apply inline-flex rounded-full px-3 py-1 text-xs font-bold; }
+.role-admin { @apply bg-violet-50 text-violet-700; }
+.role-user { @apply bg-indigo-50 text-indigo-700; }
+.default-account { @apply inline-flex flex-col gap-2; }
+.default-account button { @apply opacity-50 cursor-not-allowed; }
+.default-account button:hover { transform: none; }
+.user-cards { @apply grid gap-4 mt-6; }
+.user-card { @apply bg-surface border border-border rounded-xl p-5 space-y-5; }
+.user-card dl { @apply grid gap-2 text-sm; grid-template-columns: 5rem minmax(0, 1fr); }
+.user-card dt { @apply text-muted; }
+@media (min-width: 640px) {
+  .users-table-wrap { display: block; margin-top: 1.5rem; }
+  .user-cards { display: none; }
+  .admin-quick-links, .admin-post-actions { flex-direction: row; }
+  .admin-post-actions { align-items: center; }
+}
+@media (min-width: 768px) {
+  .admin-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .managed-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .managed-form button { justify-self: start; }
+}
+@media (min-width: 1024px) {
+  .admin-post { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+}
 @keyframes float-note { 0%, 100% { transform: translateY(0) rotate(3deg); } 50% { transform: translateY(-8px) rotate(2deg); } }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition-duration: 0ms !important; scroll-behavior: auto !important; }

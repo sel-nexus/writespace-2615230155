@@ -13,8 +13,10 @@ import Blogs from "./pages/Blogs.jsx";
 import BlogDetail from "./pages/BlogDetail.jsx";
 import WritePost from "./pages/WritePost.jsx";
 import EditPost from "./pages/EditPost.jsx";
+import AdminDashboard from "./pages/AdminDashboard.jsx";
+import Users from "./pages/Users.jsx";
 
-/** Compose available routes and resolve guards before future route fallbacks.
+/** Compose real feature routes and resolve guest and role guards.
  * Returns: {JSX.Element} Route shell restored from localStorage.
  */
 function RouteShell() {
@@ -90,17 +92,22 @@ function RouteShell() {
             </ProtectedRoute>
           }
         />
-        {["/admin", "/users"].map((path) => (
-          <Route
-            key={path}
-            path={path}
-            element={
-              <ProtectedRoute session={session} requiredRole="admin">
-                <NotFound />
-              </ProtectedRoute>
-            }
-          />
-        ))}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute session={session} requiredRole="admin">
+              <AdminDashboard session={session} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoute session={session} requiredRole="admin">
+              <Users session={session} />
+            </ProtectedRoute>
+          }
+        />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
