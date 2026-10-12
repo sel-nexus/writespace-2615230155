@@ -33,6 +33,17 @@ export default function AdminDashboard({ session = null }) {
    * Returns: Nothing; preserve route and rendered snapshot on error or cancel.
    */
   function manage(event, id, deleting) {
+    // Preserve native link activation; EditPost rechecks destination guards.
+    if (
+      !deleting &&
+      (event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey)
+    ) {
+      return;
+    }
     event.preventDefault();
     setMessage("");
     if (!resolveAccess(session, "admin").allow) {

@@ -16,6 +16,7 @@ import {
   readSession,
   writeUsers,
   readUsers,
+  writePosts,
 } from "../src/lib/storage.js";
 const member = {
   userId: "u1",
@@ -228,6 +229,70 @@ it("binds optional field, input value and error description", async () => {
   expect(screen.getByLabelText("Name")).toHaveAccessibleDescription("Required");
   expect(screen.getByRole("alert")).toHaveTextContent("Required");
 });
+it.each([
+  ["/", "WriteSpace"],
+  ["/login", "Login | WriteSpace"],
+  ["/register", "Register | WriteSpace"],
+  ["/blogs", "All Blogs | WriteSpace"],
+  ["/write", "Write | WriteSpace"],
+  ["/admin", "Admin | WriteSpace"],
+  ["/users", "Users | WriteSpace"],
+  ["/unknown", "Page not found | WriteSpace"],
+  ["/blog/missing", "Post not found | WriteSpace"],
+  ["/edit/missing", "Post not found | WriteSpace"],
+])("sets the document title for %s", (path, title) => {
+  if (!["/", "/login", "/register", "/unknown"].includes(path)) {
+    writeSession(DEFAULT_ADMIN);
+  }
+  window.history.replaceState({}, "", path);
+  render(<App />);
+  expect(document.title).toBe(title);
+});
+it.each(["/blog/%", "/edit/%"])(
+  "handles malformed percent encoding at %s without an uncaught exception",
+  (path) => {
+    writeSession(DEFAULT_ADMIN);
+    window.history.replaceState({}, "", path);
+    document.title = "Previous page | WriteSpace";
+    expect(() => render(<App />)).not.toThrow();
+    expect(document.title).toBe("Post not found | WriteSpace");
+    expect(
+      screen.getByRole("heading", { name: "Post not found" })
+    ).toBeInTheDocument();
+    expect(window.location.pathname).toBe(path);
+  }
+);
+it("updates resource titles across detail, edit, save and list navigation", async () => {
+  writeSession(DEFAULT_ADMIN);
+  writePosts([{
+    id: "post with spaces",
+    title: "Original writing",
+    content: "Synthetic local text",
+    authorId: DEFAULT_ADMIN.userId,
+    authorName: DEFAULT_ADMIN.displayName,
+    createdAt: "2026-01-01T00:00:00.000Z",
+  }]);
+  window.history.replaceState({}, "", "/blog/post%20with%20spaces");
+  render(<App />);
+  expect(document.title).toBe("Original writing | WriteSpace");
+  await userEvent.click(screen.getByRole("link", { name: "Edit Post" }));
+  expect(document.title).toBe("Edit: Original writing | WriteSpace");
+  await userEvent.clear(screen.getByLabelText("Title"));
+  await userEvent.type(screen.getByLabelText("Title"), "Revised writing");
+  await userEvent.click(screen.getByRole("button", { name: "Save Changes" }));
+  expect(document.title).toBe("Revised writing | WriteSpace");
+  await userEvent.click(screen.getByRole("link", { name: "Back to All Blogs" }));
+  expect(document.title).toBe("All Blogs | WriteSpace");
+});
+it("updates guest route titles without remounting the App", async () => {
+  window.history.replaceState({}, "", "/login");
+  render(<App />);
+  expect(document.title).toBe("Login | WriteSpace");
+  await userEvent.click(screen.getByRole("link", { name: "Get Started Free", exact: true }));
+  expect(document.title).toBe("Register | WriteSpace");
+  await userEvent.click(screen.getByRole("link", { name: "WriteSpace", exact: true }));
+  expect(document.title).toBe("WriteSpace");
+});
 it.each(["/blogs", "/blog/p1", "/write", "/edit/p1", "/admin", "/users"])(
   "redirects guest protected route %s to login",
   (path) => {
@@ -235,6 +300,7 @@ it.each(["/blogs", "/blog/p1", "/write", "/edit/p1", "/admin", "/users"])(
     render(<App />);
     expect(screen.getByRole("heading", { name: "Login" })).toBeInTheDocument();
     expect(window.location.pathname).toBe("/login");
+    expect(document.title).toBe("Login | WriteSpace");
   }
 );
 it.each([
@@ -322,7 +388,9 @@ it("preserves App identity on logout failure then allows explicit retry", async 
 it("shows unknown route fallback and follows home link", async () => {
   window.history.replaceState({}, "", "/unknown");
   render(<App />);
+  expect(document.title).toBe("Page not found | WriteSpace");
   await userEvent.click(screen.getByRole("link", { name: "Back to Home" }));
+  expect(document.title).toBe("WriteSpace");
   expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
     "Your thoughts."
   );

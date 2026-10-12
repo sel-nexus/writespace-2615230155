@@ -24,7 +24,7 @@ export default function Landing({ session = null }) {
             <div className="hero-copy">
               <p className="eyebrow">A little room for your words</p>
               <h1 id="hero-title">Your thoughts. Your space. Beautifully simple.</h1>
-              <p className="text-lg text-muted">A quiet place to put pen to page. Write, read, and keep your ideas close — right here in your browser.</p>
+              <p className="text-lg text-muted">A quiet place to put pen to page. Write, read, and keep your ideas close, right here in your browser.</p>
               <div className="hero-actions">
                 <Link className="button primary" to={session ? roleHome(session) : '/register'}>
                   {session ? 'Go to Dashboard' : 'Get Started Free'}
@@ -43,23 +43,23 @@ export default function Landing({ session = null }) {
         <div className="page-container">
           <section className="features" aria-label="Features">
             <article className="feature border-t-indigo-600">
-              <p className="eyebrow">01 / Expression</p>
+        
               <h2>Write Freely</h2>
               <p>Let your ideas take shape in plain text, without the distractions.</p>
             </article>
             <article className="feature border-t-violet-600">
-              <p className="eyebrow">02 / Your browser</p>
+        
               <h2>Private &amp; Local</h2>
               <p>Your writing stays in this browser profile. No cloud account or synchronization.</p>
             </article>
             <article className="feature border-t-teal-500">
-              <p className="eyebrow">03 / In the moment</p>
+        
               <h2>Instant &amp; Fast</h2>
               <p>Move from a thought to a page with simple, local navigation.</p>
             </article>
           </section>
           <section className="py-16" aria-labelledby="latest-title">
-            <p className="eyebrow">From this browser</p>
+            
             <h2 id="latest-title">Latest Posts</h2>
             {posts.length === 0 ? (
               <EmptyState
@@ -73,7 +73,11 @@ export default function Landing({ session = null }) {
                 {posts.map((post, index) => (
                   <article className={`preview-card ${accents[index % 4]}`} key={post.id}>
                     <p className="text-sm text-muted">{formatDate(post.createdAt)}</p>
-                    <h3><Link to={`/blog/${encodeURIComponent(post.id)}`}>{post.title}</Link></h3>
+                    <h3>
+                      <Link to={`/blog/${encodeURIComponent(post.id)}`}>
+                        {post.title}
+                      </Link>
+                    </h3>
                     <p className="text-muted">{excerpt(post.content)}</p>
                     <div className="flex items-center gap-3">
                       <Avatar name={post.authorName} />
@@ -86,7 +90,7 @@ export default function Landing({ session = null }) {
           </section>
           <p className="demo-warning">
             Demo only: credentials are stored in plaintext. Sessions and roles can
-            be modified in your browser. Use synthetic, non-sensitive data only —
+            be modified in your browser. Use synthetic, non-sensitive data only;
             never a real password. Clearing browser storage loses local data; tabs
             do not synchronize.
           </p>
@@ -94,7 +98,11 @@ export default function Landing({ session = null }) {
       </main>
       <footer className="footer">
         <div className="page-container flex flex-col gap-6 sm:flex-row sm:justify-between">
-          <p>© {new Date().getFullYear()} WriteSpace</p>
+          <p>
+            {'© '}
+            {new Date().getFullYear()}
+            {' WriteSpace'}
+          </p>
           <nav aria-label="Footer navigation" className="flex flex-wrap gap-6">
             <Link to="/">Home</Link>
             <Link to="/blogs">All Blogs</Link>

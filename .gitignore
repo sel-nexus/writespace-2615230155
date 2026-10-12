@@ -19,3 +19,4 @@ graphify-out/cache/
 graphify-out/cost.json
 test-results/
 playwright-report/
+playwright-account-report/

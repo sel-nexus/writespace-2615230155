@@ -1,6 +1,12 @@
 /** Verify Admin activity and explicitly activated post actions using local storage. */
 import { it, expect, vi } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import {
+  createEvent,
+  fireEvent,
+  render,
+  screen,
+  within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import AdminDashboard from "../src/pages/AdminDashboard.jsx";
@@ -141,6 +147,62 @@ it("opens another author’s detail and edit through dashboard links", async () 
   ).toBeInTheDocument();
   expect(readPosts()).toEqual([post]);
 });
+it.each(
+  ["permitted", "missing", "stale"].flatMap((state) =>
+    [
+      ["metaKey", { button: 0, metaKey: true }],
+      ["ctrlKey", { button: 0, ctrlKey: true }],
+      ["shiftKey", { button: 0, shiftKey: true }],
+      ["altKey", { button: 0, altKey: true }],
+      ["middle button", { button: 1 }],
+      ["right button", { button: 2 }],
+    ].map(([activation, options]) => [activation, state, options])
+  )
+)("preserves native %s edit activation for a %s target", (activation, state, options) => {
+  const session = { ...DEFAULT_ADMIN };
+  writePosts([post]);
+  mount(session);
+  const link = screen.getByRole("link", { name: `Edit ${post.title}` });
+  if (state === "missing") writePosts([]);
+  if (state === "stale") session.role = "user";
+  const event = createEvent.click(link, options);
+
+  fireEvent(link, event);
+
+  expect(event.defaultPrevented).toBe(false);
+  expect(link).toHaveAttribute("href", "/edit/p1");
+  expect(screen.getByRole("heading", { name: "Admin Dashboard" })).toBeInTheDocument();
+  expect(screen.queryByRole("heading", { name: "Edit destination" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  expect(readPosts()).toEqual(state === "missing" ? [] : [post]);
+});
+it.each(["permitted", "missing", "stale"])(
+  "checks latest access and cancels ordinary edit activation for a %s target",
+  (state) => {
+    const session = { ...DEFAULT_ADMIN };
+    writePosts([post]);
+    mount(session);
+    const link = screen.getByRole("link", { name: `Edit ${post.title}` });
+    if (state === "missing") writePosts([]);
+    if (state === "stale") session.role = "user";
+    const event = createEvent.click(link, { button: 0 });
+
+    fireEvent(link, event);
+
+    expect(event.defaultPrevented).toBe(true);
+    if (state === "permitted") {
+      expect(screen.getByRole("heading", { name: "Edit destination" })).toBeInTheDocument();
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    } else {
+      expect(screen.getByRole("heading", { name: "Admin Dashboard" })).toBeInTheDocument();
+      expect(screen.queryByRole("heading", { name: "Edit destination" })).not.toBeInTheDocument();
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        state === "missing" ? "no longer exists" : "Only Admin"
+      );
+    }
+    expect(readPosts()).toEqual(state === "missing" ? [] : [post]);
+  }
+);
 it("cancel leaves storage unchanged, confirm deletes fresh record and refreshes counts/recent view", async () => {
   writePosts([post]);
   const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);

@@ -37,7 +37,13 @@ export default function Login({ session = null, onSession }) {
           Demo only. Passwords are plaintext and browser sessions are user-modifiable.
           Use synthetic credentials, never a real password.
         </p>
-        <p className="mt-6 text-sm">Try the default Admin: username <strong>admin</strong>, password <strong>admin</strong>.</p>
+        <p className="mt-6 text-sm">
+          {'Try the default Admin: username '}
+          <strong>admin</strong>
+          {', password '}
+          <strong>admin</strong>
+          .
+        </p>
       </section>
       <section className="auth-card" aria-labelledby="login-title">
         <h2 id="login-title">Login</h2>
@@ -62,7 +68,12 @@ export default function Login({ session = null, onSession }) {
           {message && <p role="alert" className="error-banner">{message}</p>}
           <button className="button primary w-full" type="submit">Login</button>
         </form>
-        <p className="mt-6 text-sm">New here? <Link className="text-primary-700 underline" to="/register">Get Started Free</Link></p>
+        <p className="mt-6 text-sm">
+          {'New here? '}
+          <Link className="text-primary-700 underline" to="/register">
+            Get Started Free
+          </Link>
+        </p>
       </section>
     </main>
   );

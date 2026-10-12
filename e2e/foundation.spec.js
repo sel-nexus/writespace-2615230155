@@ -128,6 +128,7 @@ for (const width of [390, 1024]) {
     await expect(page.getByRole("heading", { level: 1 })).toContainText(
       "Your thoughts."
     );
+    await expect(page).toHaveTitle("WriteSpace");
     await capture(page, testInfo, "landing-empty");
     if (width < 640) {
       await page
@@ -147,9 +148,10 @@ for (const width of [390, 1024]) {
         .first()
         .click();
     }
+    await expect(page).toHaveTitle("Login | WriteSpace");
     await capture(page, testInfo, "account-login");
     await page.getByRole("button", { name: "Login", exact: true }).click();
-    await expect(page.getByRole("alert")).toHaveText(
+    await expect(page.getByRole("alert").filter({ hasText: "Invalid username or password." })).toHaveText(
       "Invalid username or password."
     );
     await capture(page, testInfo, "account-error");
@@ -157,8 +159,10 @@ for (const width of [390, 1024]) {
     await expect(
       page.getByRole("heading", { name: "Admin Dashboard" })
     ).toBeVisible();
+    await expect(page).toHaveTitle("Admin | WriteSpace");
     await capture(page, testInfo, "Admin-empty");
     await page.getByRole("link", { name: "Manage Users" }).click();
+    await expect(page).toHaveTitle("Users | WriteSpace");
     await capture(page, testInfo, "account-empty");
     await page
       .getByRole("button", { name: "Create Account", exact: true })
@@ -175,6 +179,7 @@ for (const width of [390, 1024]) {
     await capture(page, testInfo, "account-populated");
     await nav(page, "Write");
     await expect(page.getByLabel("Content", { exact: true })).toHaveValue("");
+    await expect(page).toHaveTitle("Write | WriteSpace");
     await capture(page, testInfo, "editor-empty");
     await page.getByLabel("Title", { exact: true }).fill("Preflight writing");
     await page
@@ -185,8 +190,10 @@ for (const width of [390, 1024]) {
     await expect(
       page.getByRole("heading", { name: "Preflight writing" })
     ).toBeVisible();
+    await expect(page).toHaveTitle("Preflight writing | WriteSpace");
     await capture(page, testInfo, "detail-populated");
     await nav(page, "All Blogs");
+    await expect(page).toHaveTitle("All Blogs | WriteSpace");
     await capture(page, testInfo, "blogs-populated");
     await nav(page, "Users");
     await page.getByRole("link", { name: "Back to Admin Dashboard" }).click();
@@ -284,6 +291,7 @@ test("registration → writing → Admin account/post oversight → reload keeps
   page,
 }) => {
   await page.goto("/register");
+  await expect(page).toHaveTitle("Register | WriteSpace");
   await page.getByLabel("Display Name").fill("Foundation Writer");
   await page.getByLabel("Username", { exact: true }).fill("foundation-writer");
   await page.getByLabel("Password", { exact: true }).fill("synthetic");
@@ -321,10 +329,12 @@ test("registration → writing → Admin account/post oversight → reload keeps
   await page
     .getByRole("link", { name: `Edit ${created.title}`, exact: true })
     .click();
+  await expect(page).toHaveTitle(`Edit: ${created.title} | WriteSpace`);
   await page
     .getByLabel("Title", { exact: true })
     .fill("Admin-reviewed writing");
   await page.getByRole("button", { name: "Save Changes" }).click();
+  await expect(page).toHaveTitle("Admin-reviewed writing | WriteSpace");
   const revised = { ...created, title: "Admin-reviewed writing" };
   expect(await stored(page, "posts")).toEqual([revised]);
   await nav(page, "Users");

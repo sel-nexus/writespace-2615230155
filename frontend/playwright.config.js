@@ -12,7 +12,7 @@ export default defineConfig({
   webServer: {
     command: `node node_modules/vite/bin/vite.js preview --host 0.0.0.0 --port ${port} --strictPort`,
     url: baseURL,
-    reuseExistingServer: false,
+    reuseExistingServer: true,
     timeout: 30000,
   },
 });

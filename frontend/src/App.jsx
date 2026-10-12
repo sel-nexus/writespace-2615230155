@@ -1,7 +1,7 @@
 /** Own the single router and persistence-aware browser session lifecycle. */
-import { useState } from "react";
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
-import { readSession, clearSession } from "./lib/storage.js";
+import { useState, useEffect } from "react";
+import { BrowserRouter, Routes, Route, useNavigate, useLocation, matchPath } from "react-router-dom";
+import { readSession, clearSession, readPosts } from "./lib/storage.js";
 import { AppNavbar } from "./components/AppNavbar.jsx";
 import { PublicNavbar } from "./components/PublicNavbar.jsx";
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
@@ -23,6 +23,38 @@ function RouteShell() {
   const [session, setSession] = useState(readSession);
   const [logoutError, setLogoutError] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Keep browser history and post/edit resource titles in sync with the route.
+  useEffect(() => {
+    const titles = {
+      "/": "",
+      "/login": "Login",
+      "/register": "Register",
+      "/blogs": "All Blogs",
+      "/write": "Write",
+      "/admin": "Admin",
+      "/users": "Users",
+    };
+    const route = Object.keys(titles).find((path) => matchPath(path, location.pathname));
+    let title = route === undefined ? "Page not found" : titles[route];
+    const resource = matchPath("/blog/:id", location.pathname) ||
+      matchPath("/edit/:id", location.pathname);
+    if (resource) {
+      let id = resource.params.id;
+      try {
+        id = decodeURIComponent(id);
+      } catch {
+        // Malformed encoding cannot identify a stored post.
+        id = null;
+      }
+      const post = readPosts().find((candidate) => candidate.id === id);
+      title = post
+        ? `${resource.pattern.path === "/edit/:id" ? "Edit: " : ""}${post.title}`
+        : "Post not found";
+    }
+    document.title = title ? `${title} | WriteSpace` : "WriteSpace";
+  }, [location]);
 
   /** Remove only durable session before clearing the rendered identity. */
   function logout() {

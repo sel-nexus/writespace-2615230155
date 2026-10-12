@@ -16,6 +16,42 @@ test('guest preview and protected reading action lead to login with exact invali
   await expect(page.getByRole('button', { name: 'Create Account' })).toBeVisible();
 });
 
+for (const mobile of [false, true]) {
+  test(`${mobile ? 'mobile' : 'desktop'} navbar Get Started opens the real registration form`, async ({ page }) => {
+    await page.setViewportSize(mobile ? { width: 390, height: 844 } : { width: 1280, height: 800 });
+    await page.goto('/');
+    if (mobile) await page.getByRole('button', { name: 'Open menu' }).click();
+    await page.getByRole('navigation', { name: 'Public navigation' })
+      .getByRole('link', { name: 'Get Started', exact: true }).click();
+    await expect(page).toHaveURL(/\/register$/);
+    await expect(page.getByLabel('Display Name')).toBeVisible();
+    await expect(page.getByLabel('Username', { exact: true })).toBeVisible();
+    await expect(page.getByLabel('Password', { exact: true })).toBeVisible();
+    await expect(page.getByLabel('Confirm Password')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Create Account' })).toBeVisible();
+    if (mobile) {
+      await expect(page.getByRole('button', { name: 'Open menu' })).toHaveAttribute('aria-expanded', 'false');
+    }
+  });
+}
+
+test('footer Register opens the real form and creates a stored user', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('navigation', { name: 'Footer navigation' })
+    .getByRole('link', { name: 'Register', exact: true }).click();
+  await expect(page).toHaveURL(/\/register$/);
+  await expect(page.getByRole('button', { name: 'Create Account' })).toBeVisible();
+  await page.getByLabel('Display Name').fill('Footer Writer');
+  await page.getByLabel('Username', { exact: true }).fill('footer-writer');
+  await page.getByLabel('Password', { exact: true }).fill('synthetic');
+  await page.getByLabel('Confirm Password').fill('synthetic');
+  await page.getByRole('button', { name: 'Create Account' }).click();
+  await expect(page).toHaveURL(/\/blogs$/);
+  const users = await page.evaluate(() => JSON.parse(localStorage.getItem('writespace_users')));
+  expect(users).toHaveLength(1);
+  expect(users[0]).toMatchObject({ displayName: 'Footer Writer', username: 'footer-writer', role: 'user' });
+});
+
 test('registration validation, user persistence, logout and exact stored login survive reload', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('link', { name: 'Get Started Free', exact: true }).click();
@@ -63,7 +99,7 @@ test('fixed Admin login persists canonical role and logs out via account dropdow
   await page.getByRole('button', { name: 'Login', exact: true }).click();
   await expect(page).toHaveURL(/\/admin$/);
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('writespace_session')))).toEqual({ userId: 'admin', username: 'admin', displayName: 'Admin', role: 'admin' });
-  await expect(page.getByRole('link', { name: 'Users' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Users', exact: true })).toBeVisible();
   await page.reload();
   await page.getByRole('button', { name: /Admin/ }).click();
   await page.getByRole('button', { name: 'Logout' }).click();
