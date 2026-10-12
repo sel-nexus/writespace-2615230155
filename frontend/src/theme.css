@@ -74,6 +74,14 @@ body { margin: 0; min-width: 320px; }
   .post-author, .post-title { overflow-wrap: anywhere; }
   .post-detail { @apply max-w-3xl mx-auto space-y-8; }
   .post-content { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.8; }
+  /* Reuse editorial measure and field tokens; let long plain-text drafts resize. */
+  .editor-layout { @apply max-w-3xl mx-auto; }
+  .post-editor { @apply mt-8 space-y-6; }
+  .post-editor textarea { @apply w-full rounded-xl border border-border bg-surface p-4 text-foreground; min-height: 256px; resize: vertical; }
+  .post-editor textarea[aria-invalid='true'] { border-color: #dc2626; }
+  .character-counter { @apply text-sm text-muted text-right; font-variant-numeric: tabular-nums; }
+  .editor-actions { @apply flex flex-col gap-3 md:flex-row; }
+  .destructive { @apply bg-red-50 text-red-600 border border-red-200; }
   .footer { @apply bg-neutral-900 text-neutral-200 mt-16 py-12; }
   .footer a:hover { @apply text-white; }
   .skip-link { @apply fixed -top-20 left-4 z-50 bg-surface p-3 rounded-lg; }

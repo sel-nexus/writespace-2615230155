@@ -35,7 +35,7 @@ for (const entry of ['/blogs', '/blog/newer']) {
     await expect(page.locator('.post-content script, .post-content b')).toHaveCount(0);
     expect(await page.locator('.post-content').evaluate((element) => getComputedStyle(element).whiteSpace)).toBe('pre-wrap');
     await expect(page.getByRole('link', { name: 'Edit Post' })).toHaveAttribute('href', '/edit/newer');
-    await expect(page.getByRole('button', { name: /delete/i })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Delete Post', exact: true })).toBeVisible();
     await page.reload();
     expect(await page.locator('.post-content').textContent()).toBe(content);
     expect(await page.evaluate(() => JSON.parse(localStorage.getItem('writespace_posts')))).toEqual([older, newer]);
