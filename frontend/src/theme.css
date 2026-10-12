@@ -68,6 +68,12 @@ body { margin: 0; min-width: 320px; }
   .preview-card:hover { transform: translateY(-3px); }
   .preview-card h3 { overflow-wrap: anywhere; }
   .preview-card p { overflow-wrap: anywhere; }
+  /* Extend the inherited cards and editorial measure for plain-text reading. */
+  .post-card-title { font-size: 1.4rem; line-height: 1.35; overflow-wrap: anywhere; }
+  .post-excerpt { white-space: pre-wrap; overflow-wrap: anywhere; }
+  .post-author, .post-title { overflow-wrap: anywhere; }
+  .post-detail { @apply max-w-3xl mx-auto space-y-8; }
+  .post-content { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.8; }
   .footer { @apply bg-neutral-900 text-neutral-200 mt-16 py-12; }
   .footer a:hover { @apply text-white; }
   .skip-link { @apply fixed -top-20 left-4 z-50 bg-surface p-3 rounded-lg; }

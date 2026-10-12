@@ -9,6 +9,8 @@ import Landing from './pages/Landing.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import NotFound from './pages/NotFound.jsx';
+import Blogs from './pages/Blogs.jsx';
+import BlogDetail from './pages/BlogDetail.jsx';
 
 /** Compose available routes and resolve guards before future route fallbacks.
  * Returns: {JSX.Element} Route shell restored from localStorage.
@@ -35,7 +37,23 @@ function RouteShell() {
         <Route path="/" element={<Landing session={session} />} />
         <Route path="/login" element={<Login session={session} onSession={setSession} />} />
         <Route path="/register" element={<Register session={session} onSession={setSession} />} />
-        {['/blogs', '/blog/:id', '/write', '/edit/:id', '/admin', '/users'].map((path) => (
+        <Route
+          path="/blogs"
+          element={
+            <ProtectedRoute session={session}>
+              <Blogs />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/blog/:id"
+          element={
+            <ProtectedRoute session={session}>
+              <BlogDetail session={session} />
+            </ProtectedRoute>
+          }
+        />
+        {['/write', '/edit/:id', '/admin', '/users'].map((path) => (
           <Route key={path} path={path} element={
             <ProtectedRoute session={session} requiredRole={path === '/admin' || path === '/users' ? 'admin' : undefined}>
               <NotFound />

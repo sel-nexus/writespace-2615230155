@@ -115,13 +115,15 @@ it.each(['/blogs', '/blog/p1', '/write', '/edit/p1', '/admin', '/users'])('redir
   window.history.replaceState({}, '', path); render(<App />);
   expect(screen.getByRole('heading', { name: 'Login' })).toBeInTheDocument(); expect(window.location.pathname).toBe('/login');
 });
-it.each(['/blogs', '/blog/p1', '/write', '/edit/p1', '/admin', '/users'])('renders guarded NotFound for allowed future route %s', (path) => {
+it.each(['/write', '/edit/p1', '/admin', '/users'])('renders guarded NotFound for allowed future route %s', (path) => {
   writeSession(DEFAULT_ADMIN); window.history.replaceState({}, '', path); render(<App />);
   expect(screen.getByRole('heading', { name: 'Page not found' })).toBeInTheDocument(); expect(window.location.pathname).toBe(path);
 });
 it.each(['/admin', '/users'])('redirects member Admin route %s before NotFound', (path) => {
   writeSession(member); window.history.replaceState({}, '', path); render(<App />);
-  expect(window.location.pathname).toBe('/blogs'); expect(screen.getByRole('heading', { name: 'Page not found' })).toBeInTheDocument();
+  expect(window.location.pathname).toBe('/blogs');
+  expect(screen.getByRole('heading', { level: 1, name: 'All Blogs' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'No posts yet' })).toBeInTheDocument();
 });
 it('restores session on remount and logout preserves accounts', async () => {
   writeSession(member);
